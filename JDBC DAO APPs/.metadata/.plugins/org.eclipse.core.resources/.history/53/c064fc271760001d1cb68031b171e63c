@@ -1,0 +1,31 @@
+package com.masai.usecases;
+
+import java.util.Scanner;
+
+import com.masai.dao.StudentDao;
+import com.masai.dao.StudentDaoImpl;
+import com.masai.model.Student;
+
+public class GetStudentByRoll {
+
+	public static void main(String[] args) {
+		
+		// TODO Auto-generated method stub
+		
+        Scanner sc = new Scanner(System.in);
+		
+		System.out.println("Enter Roll :");
+		int roll = sc.nextInt();
+		
+		StudentDao dao = new StudentDaoImpl();
+		
+		Student student = dao.getStudentByRoll(roll);
+		
+		if(student != null) 
+			System.out.println(student);
+		else
+			System.out.println("Student does not exist with roll " + roll);
+
+	}
+
+}
