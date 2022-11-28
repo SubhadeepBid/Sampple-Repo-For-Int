@@ -1,0 +1,143 @@
+Files and IO-streams:
+
+
+Reader(AC) class : it is the super class of all the classes using which we can read the 
+data from the source in the form of Charecter.
+
+Writer(AC) class: it is the super class of all the classes using which we can write the 
+data to the destination in the form of Charecter.
+
+InputStream(AC) class : it is the super class of all the classes using which we can read the 
+data from the source in the form of Bytes.
+
+OutputStream(AC) class: it is the super class of all the classes using which we can write the 
+data to the destination in the form of Bytes.
+
+
+FileWriter class:
+----------------------
+
+constructors of the FileWriter class:
+--------------------------------------------
+
+FileWriter fw = new FileWriter(String fname)throws IOExcepiton;
+
+FileWriter fw = new FileWriter(String fname,boolean flag)throws IOExcepiton;
+//it will open the file in appending mode.
+
+FileWriter fw = new FileWriter(File file)throws IOExcepiton;
+
+
+Note: if the specified file is not avialable then the above constructors will create a new file .
+
+
+some of the methods of FileWriter class:
+---------------------------------------------------
+
+write(int ch);// to write a single charecter to the file // ASCII / UNICODE
+97 --a
+
+write(char[] ch);// write the array of charecters to the file.
+
+write(String s);// write the string to the file.
+
+flush(); it gives the guarantee that last charecter of the data is also written to the file.
+
+close(); 
+
+Note: the main limitation of the FileWriter class is we need to add line seperator manually, which is either 
+"\n" or "\r\n". which will depend upon underlaying OS.
+
+
+FileReader:
+==========
+
+--to read the charecter data from the File to our application:
+
+methods of FileReader class:
+------------------------------------
+int read(); // it attempts to read the next charecter from the file and returns it 
+in the form of int value(ASCII/ UNICODE) value.
+
+--if the next charecter is not available then this method will return -1.
+-1 will represent end of the File.
+
+abc 
+
+read(); //97 98 99 -1
+
+
+int read(char[] chr);// it will attempts to read the enough charecter from the file into the supplied char array and returns the number of charecter copied into the array.
+
+ex1:
+kjsdffhlksdjflkdsjflkdsfjl
+
+char[] chr= new char[10];
+
+read(chr); // it returns 10
+
+ex2:
+
+ex1:
+kjsd
+
+char[] chr= new char[10];
+
+read(chr); // it returns 4	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

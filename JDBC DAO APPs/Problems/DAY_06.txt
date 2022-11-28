@@ -1,0 +1,478 @@
+--we can suspend a current executing thread based on 3 criteria.
+
+1. based on time// here we use sleep() method
+
+2. conditionaly : here we use join() method 
+
+3. unconditionally : wait(), notify() and notifyAll() // these methods belongs to Object.
+
+
+
+Thread safety:
+=============
+
+--single resource shared by multiple threads simulteniously, which leads to the Race condition that may cause data inconsistancy problem.
+
+--we can solve this problem with the help of synchronized keyword.
+
+
+synchronized keyword:
+==================
+
+--by the help of synchronized keyword we achive thread safety in java.
+
+--this keuword is applicable only with the methods or blocks, we can not use 
+it with contrcutors or with variables.
+
+
+--if a method or block is declared as sync then at a time only one thread is allowed to execute that method or block on the given object. so that data inconsistancy problem will be resolved.
+
+--the main adv of this sych keyword is we can resolve the data inconsistency problem.
+
+--but the main disadv of this keyword, it will increase the waiting time of a thread and it causes the performance issue.
+
+--hence, if there is no specific requirement then it is never recomended to use 
+synch keyword.
+
+checking the seat availabilty: this functionality should be non-synch, where as 
+booking seat functionality should be synchronized.
+
+--checking balance should be non-synch, where as transfering amount should be 
+synchronized.
+
+--any method that changes the state of an object like performing 
+add/update/delete/replace oprations should be synchronized.
+
+Note: while once thread is executing synch method on the given object then
+remaining threads are not allowed to execute any other synch method also simulteniusly.
+but remaining threads are allowed to execute any non-synch method simulteniusly/
+
+ex:  t1 
+
+class A{
+
+synchronized void funA(){
+// 1 hour 
+}
+
+synchronized void funB(){
+}
+
+void funC(){
+}
+
+}
+
+
+--if a thread t1 executes funA, then other thread t2 can not enter into the method funA() simulteniuosly even t2 thread can not enter to other synchronized methods of A object also.
+
+
+Note: synchronized keyword works based on the locking concept.
+
+--each object of a class has one unique lock, if a thread try to execute a synchronized method
+then it needs the lock of that object. once a thread acquires a lock of a given object
+then only it can start the execution of that sycn method.
+
+--Locks are one per object, not per method.
+
+
+--the thread won't release the lock of that object until it complets the synchronized method.
+once the sync method execution completed then thread releases the lock automatically.
+
+--acquiring and releasing the lock is internally taken care by the jvm, programmers are not responsible for that activity.
+
+
+--if we pass two diff object of the A class to the two diff threads then we get the 
+irregular output even though funA() is synchronized, because both threads
+operates on two diff objects of A class, and they are holding the locks of two 
+diff object.
+
+  
+--now if we try to make our funA as static, then we will get a regular output,
+irrespective of two diff object of a class.
+
+the reason is :
+
+As each object has a unique lock, similarly each class also has one unique lock
+this is called "Class level lock"
+
+--so In Java we have 2 types of locks :
+
+1. object level lock 
+
+2. class level lock
+
+
+--if a thread tries to execute any non-static synchronized method then it requires the "Object level lock"
+where as if a thread tries to execute any static synchronized method then it requires the "Class level lock"
+
+// for class A : we have only one class level lock
+//for class A : how many objects will be there those many object level locks will be there.
+	
+--Object level lock and class level locks both are the independent with each other, there is no any link between them.
+
+***Note: any type of lock is required only to execute synchronized methods.
+
+--while a thread is executing a static synchrnozed method, the remaining threads
+are not allowed to execute any other static synchronized method simulteniously.
+(even on the multiple object of that class also)
+but remaining threads are allowed to execute normal static methods and 
+synchronized non-static methods and normal non-static methods simulteniosuly
+
+class A{
+t1 --> class level lock 
+static synchronized void funA(){
+// 1 hour
+}
+
+static synchronized void funB(){
+}
+
+// t2 thread can execute funC // it needs the object level lock
+ synchronized void funC(){
+}
+
+synchronized void funD(){
+}
+
+static void funE(){
+}
+
+void funF(){
+}
+}
+
+
+synchronized block:
+================
+
+--if a very few line of statements requires thread-safety inside a method, then 
+it is not recommended to declare the entire method as synchronized , we should enclose only those few line of statements inside a synchronized block.
+
+---imagine inside a method we have 1000 statments and in the middle, somewhere few line of statements some database operation like(update/delete/add) is required then declaraing the entire method as synchronized is a wrost kind of programming. it will degrads the performance.
+
+
+--the main adv of synch block over the sycnh method is, it reduces the waiting time of the threads and improves the performance.
+
+
+Note: if we are using synch block, we should use it inside any method, not as a class instance member. otherwise we will get a compilation error.
+
+--by using sync block we can accquire any types of locks (class level lock or object level lock)
+
+--to use the sync block we have diff kind of syntax:
+
+1. getting the current object level lock:
+
+public void funA() {
+		
+		//1000
+		synchronized (this) {
+		
+
+			System.out.println("Welcome..");
+			
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			System.out.println("Admin");
+			
+		}
+		
+		//1000
+	}
+
+
+--sometime to execute certain statements we need a lock of another class obejct.
+
+
+example:
+
+
+	B b1 = new B();
+	
+
+	public void funA() {
+		
+		//1000
+		synchronized (b1) { // 
+		
+
+			System.out.println("Welcome..");
+			
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			System.out.println("Admin");
+			
+		}
+		
+		//1000
+	}
+
+
+--in the above application thread will enter into the critical section area only when
+it get the B class object b1 lock.(object level lock)
+
+--so other threads can not execute any non-static synchronized method of b1 object simulteniously.
+
+3. to get a class level lock:
+
+
+public void funA() {
+		
+		//1000
+		synchronized (B.class) { // 
+		
+				// 1 hour 
+			System.out.println("Welcome..");
+			
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			System.out.println("Admin");
+
+			
+			
+		}
+		
+		//1000
+	}
+	
+
+--here other threads can not execute any static synchronized method of B class.
+
+
+Similarities between synch method and synch block:
+==========================================
+
+1. both are used to achive thread safety.
+2. to enter into both area , a thread needs a lock.
+3. at a time only thread can execute these area.
+
+differences between synch method and sycnh block:
+=========================================
+
+1. In case of synch method, a thread can acquire only either object level lock or class level lock of that class only in which synch method is defined , then only that thread allowed to execute that perticular method.
+
+but in case of synch block, a thread can access the synch area by acquiring any type of lock (lock of that class object, lock of that class, lock of another class object, lock of another class also)
+
+
+Note: A single thread can acquire multiple lock simulteniusly :
+
+ex:
+class A{
+//here A class object level lock 1
+public synchronized void funA(){
+
+	B b1 = new B();
+	// here b1 object level lock //2 
+	synchronized(b1){
+
+		C c1 = new C();
+		// here c1 object level lock //3 
+		synchronized(c1){
+			// D class level lock //4
+			synchronized(D.class){
+			//---1000
+		}
+
+	}
+}
+}
+}
+
+--to execute statements inside the last synch block i.e (1000) statement a thread need to acquire total 4 locks.
+
+synchronized statements:
+---------------------------------
+--the statements presents inside the synchronized area is called as synchronized statements.
+
+
+Interthread Communication:
+======================
+
+--two synchronized threads communicates with each other (synch threads means, a thread which enters into the synch area)
+
+
+ex:
+
+class A{
+// t1 thread requried A object level lock
+synchronized void funA(){
+--
+-- bObj.funB();
+--
+}
+
+synchronized void fun1(){
+--
+--
+--
+}
+}
+
+
+class B{
+//t2 thread is executing funB , t2 thread requires B object lock 
+synchronized void funB(){
+-- ///1 hour 
+--
+--
+}
+}
+
+
+example of wait and notify method:
+===========================
+
+MyThread.java:
+-------------------
+
+package com.masai;
+
+public class MyThread extends Thread{
+
+	
+	int total=0;
+
+	@Override
+	public void run(){
+
+		for(int i=0;i<=100;i++){
+
+				total=total+i;
+		}
+
+	}
+}
+
+
+
+Demo.java:
+--------------
+
+package com.masai;
+
+public class Demo {
+
+	public static void main(String[] args) {
+		
+		MyThread mt=new MyThread();
+		
+		mt.start(); // 2 threads
+
+		
+		
+		System.out.println(mt.total);
+			
+	}
+		
+}
+
+
+here main thread is waiting for updation and child thread is performing the updation.
+
+here if we run the program then there may be a chance of :
+
+1. getting the total value
+2. getting the value 0 // in most cases
+3. getting a partial value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
